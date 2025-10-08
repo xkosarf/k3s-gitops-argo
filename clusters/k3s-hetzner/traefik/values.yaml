@@ -1,0 +1,13 @@
+ports:
+  web:
+    redirectTo: websecure
+  websecure:
+    tls:
+      enabled: false        # keep TLS off until cert-manager issues certs
+service:
+  type: LoadBalancer
+deployment:
+  replicas: 1
+logs:
+  general:
+    level: INFO
