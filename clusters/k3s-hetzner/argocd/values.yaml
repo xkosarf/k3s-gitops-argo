@@ -1,0 +1,6 @@
+server:
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - argocd.49.12.100.65.sslip.io
