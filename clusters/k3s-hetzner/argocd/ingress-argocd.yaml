@@ -10,10 +10,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - argocd.49.12.100.65.sslip.io
+        - argocd.kosar.sk
       secretName: argocd-tls
   rules:
-    - host: argocd.49.12.100.65.sslip.io
+    - host: argocd.kosar.sk
       http:
         paths:
           - path: /
