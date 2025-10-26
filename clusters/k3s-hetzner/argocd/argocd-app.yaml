@@ -10,8 +10,16 @@ spec:
     chart: argo-cd
     targetRevision: 8.5.10
     helm:
-      valueFiles:
-        - values.yaml
+      valueFiles: []
+      values: |
+        server:
+          service:
+            type: ClusterIP
+          ingress:
+            enabled: false
+        configs:
+          cm:
+            url: https://argocd.49.12.100.65.sslip.io
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

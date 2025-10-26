@@ -8,11 +8,17 @@ spec:
   source:
     repoURL: https://traefik.github.io/charts
     chart: traefik
-    targetRevision: 26.1.0     # adjust if a newer version is desired
+    targetRevision: 34.2.1
     helm:
-      releaseName: traefik
-      valueFiles:
-      - values.yaml
+      values: |
+        ingressClass:
+          enabled: true
+          isDefaultClass: true
+        ports:
+          web:
+            redirectTo: websecure
+        additionalArguments:
+          - "--entrypoints.websecure.http.tls=true"
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
@@ -20,5 +26,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
