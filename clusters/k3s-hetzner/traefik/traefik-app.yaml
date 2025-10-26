@@ -16,7 +16,8 @@ spec:
           isDefaultClass: true
         ports:
           web:
-            redirectTo: websecure
+            redirectToPort:
+              name: websecure
         additionalArguments:
           - "--entrypoints.websecure.http.tls=true"
   destination:
