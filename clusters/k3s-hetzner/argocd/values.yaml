@@ -1,6 +1,17 @@
 server:
+  # Disable ArgoCD's internal HTTPS redirect (Traefik will handle TLS)
+  insecure: true
+
   ingress:
     enabled: true
     ingressClassName: traefik
     hosts:
-      - argocd.49.12.100.65.sslip.io
+      - argocd.kosar.sk
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    tls:
+      - hosts:
+          - argocd.kosar.sk
+        secretName: argocd-tls
+
