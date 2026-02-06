@@ -1,5 +1,6 @@
-# Don't treat Helm values as k8s manifests
+# Helm values files are not Kubernetes manifests
 **/values.yaml
 
-# Don't apply Kyverno policies from the root app (handled by kyverno-policies app)
-kyverno/policies/**
+# Don't let cluster-root apply Kyverno policies directly (handled by kyverno-policies app)
+kyverno/policies/*.yaml
+kyverno/policies/**/*.yaml
