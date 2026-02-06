@@ -13,11 +13,9 @@ spec:
     targetRevision: 3.7.0
     helm:
       parameters:
-        # Install CRDs only
         - name: crds.install
           value: "true"
-
-        # Disable all controllers in this CRDs-only release
+        # ensure nothing else is installed
         - name: admissionController.enabled
           value: "false"
         - name: backgroundController.enabled
@@ -25,6 +23,9 @@ spec:
         - name: cleanupController.enabled
           value: "false"
         - name: reportsController.enabled
+          value: "false"
+        # also disable optional parts if present
+        - name: cleanupJobs.enabled
           value: "false"
   destination:
     server: https://kubernetes.default.svc
@@ -34,6 +35,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
       - ServerSideApply=true
       - Replace=true
