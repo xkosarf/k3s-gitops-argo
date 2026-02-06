@@ -12,3 +12,6 @@ reportsController:
 
 policyReports:
   enabled: true
+
+crds:
+  install: false

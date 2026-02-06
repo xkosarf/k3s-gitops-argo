@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno-crds
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: https://kyverno.github.io/kyverno/
+    chart: kyverno
+    targetRevision: 3.7.0
+    helm:
+      parameters:
+        # Install CRDs only
+        - name: crds.install
+          value: "true"
+
+        # Disable all controllers in this CRDs-only release
+        - name: admissionController.enabled
+          value: "false"
+        - name: backgroundController.enabled
+          value: "false"
+        - name: cleanupController.enabled
+          value: "false"
+        - name: reportsController.enabled
+          value: "false"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - Replace=true
