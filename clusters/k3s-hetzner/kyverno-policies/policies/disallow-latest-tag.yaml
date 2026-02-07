@@ -12,7 +12,9 @@ spec:
           - resources:
               kinds:
                 - Pod
+      skipBackgroundRequests: true
       validate:
+        allowExistingViolations: true
         message: "Using the 'latest' image tag is not allowed. Use a pinned tag or digest."
         pattern:
           spec:
