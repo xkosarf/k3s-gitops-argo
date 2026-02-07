@@ -4,3 +4,7 @@
 # Don't let cluster-root apply Kyverno policies directly (handled by kyverno-policies app)
 kyverno/policies/*.yaml
 kyverno/policies/**/*.yaml
+
+# Kustomize config files are not Kubernetes manifests (for cluster-root directory recursion)
+**/kustomization.yaml
+**/kustomization.yml
