@@ -3,30 +3,12 @@ kind: Application
 metadata:
   name: kyverno-crds
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
   source:
     repoURL: https://kyverno.github.io/kyverno/
-    chart: kyverno
-    targetRevision: 3.7.0
-    helm:
-      parameters:
-        - name: crds.install
-          value: "true"
-        # ensure nothing else is installed
-        - name: admissionController.enabled
-          value: "false"
-        - name: backgroundController.enabled
-          value: "false"
-        - name: cleanupController.enabled
-          value: "false"
-        - name: reportsController.enabled
-          value: "false"
-        # also disable optional parts if present
-        - name: cleanupJobs.enabled
-          value: "false"
+    chart: kyverno-crds
+    targetRevision: 3.*
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
@@ -35,5 +17,4 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - ServerSideApply=true
-      - Replace=true
+      - CreateNamespace=true
