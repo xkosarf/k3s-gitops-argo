@@ -3,14 +3,13 @@ kind: Application
 metadata:
   name: kyverno-crds
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   source:
     repoURL: https://kyverno.github.io/kyverno/
     chart: kyverno-crds
-    targetRevision: 3.7.0
+    # kyverno-crds chart uses its own versioning (2.x), not 3.7.0
+    targetRevision: "2.*"
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
@@ -20,5 +19,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - ServerSideApply=true
       - Replace=true
+      - ServerSideApply=true
