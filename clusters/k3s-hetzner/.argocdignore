@@ -1,14 +1,10 @@
 # Helm values files are not Kubernetes manifests
 **/values.yaml
 
-# Don't let cluster-root apply Kyverno policies directly (handled by kyverno-policies app)
-kyverno/policies/*.yaml
-kyverno/policies/**/*.yaml
-
-# Kustomize config files are not Kubernetes manifests (for cluster-root directory recursion)
+# Kustomize config files are not Kubernetes manifests
 **/kustomization.yaml
 **/kustomization.yml
 
-# Don't let cluster-root apply kyverno-policies manifests (handled by kyverno-policies app)
-kyverno-policies/*.yaml
-kyverno-policies/**/*.yaml
+# Don't let cluster-root apply Kyverno policies (handled by kyverno-policies app)
+**/kyverno/policies/*.yaml
+**/kyverno/policies/**/*.yaml
