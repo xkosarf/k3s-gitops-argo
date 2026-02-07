@@ -1,17 +1,2 @@
-admissionController:
-  replicas: 1
-
-backgroundController:
-  replicas: 1
-
-cleanupController:
-  replicas: 1
-
-reportsController:
-  replicas: 1
-
-policyReports:
-  enabled: true
-
 crds:
   install: false
