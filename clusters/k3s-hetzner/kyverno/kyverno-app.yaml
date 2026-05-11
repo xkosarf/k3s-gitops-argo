@@ -31,3 +31,7 @@ spec:
         - .metadata.labels
         - .metadata.managedFields
         - .status
+    - group: kyverno.io
+      kind: ClusterPolicy
+      jsonPointers:
+        - /spec/rules/0/skipBackgroundRequests
