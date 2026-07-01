@@ -3,21 +3,19 @@ kind: Application
 metadata:
   name: kyverno
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
-
   source:
     repoURL: https://kyverno.github.io/kyverno/
     chart: kyverno
     targetRevision: 3.7.0
     helm:
-      values: |
-        installCRDs: false
-
+      releaseName: kyverno
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
-
   syncPolicy:
     automated:
       prune: true
@@ -25,8 +23,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - Replace=true
-
   ignoreDifferences:
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition
@@ -35,3 +31,7 @@ spec:
         - .metadata.labels
         - .metadata.managedFields
         - .status
+    - group: kyverno.io
+      kind: ClusterPolicy
+      jsonPointers:
+        - /spec/rules/0/skipBackgroundRequests

@@ -7,18 +7,15 @@ metadata:
     argocd.argoproj.io/sync-wave: "10"
 spec:
   project: default
-
   source:
     repoURL: git@github.com:xkosarf/k3s-gitops-argo.git
     targetRevision: main
     path: clusters/k3s-hetzner/kyverno/policies
     directory:
       recurse: true
-
   destination:
     server: https://kubernetes.default.svc
     namespace: kyverno
-
   syncPolicy:
     automated:
       prune: true
