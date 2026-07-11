@@ -15,7 +15,7 @@ spec:
       releaseName: falco
       values: |
         driver:
-          kind: ebpf
+          kind: modern_ebpf
         falcosidekick:
           enabled: false
         resources:
