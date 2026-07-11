@@ -16,11 +16,8 @@ spec:
       values: |
         trivy:
           ignoreUnfixed: true
-          dbRegistry: ghcr.io
-          dbRepository: aquasecurity/trivy-db
-          javaDbRegistry: ghcr.io
-          javaDbRepository: aquasecurity/trivy-java-db
         operator:
+          builtInTrivyServer: true
           scanJobsConcurrentLimit: 1
           scanJobTimeout: 10m
   destination:
