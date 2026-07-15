@@ -21,7 +21,10 @@ spec:
           json_include_output_property: true
           json_include_message_property: true
         falcosidekick:
-          enabled: false
+          enabled: true
+          config:
+            loki:
+              hostport: http://loki-stack.monitoring.svc.cluster.local:3100
         resources:
           requests:
             cpu: 100m
