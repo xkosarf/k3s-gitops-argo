@@ -17,8 +17,9 @@ spec:
         driver:
           kind: modern_ebpf
         falco:
-          jsonOutput: true
-          jsonIncludeOutputProperty: true
+          json_output: true
+          json_include_output_property: true
+          json_include_message_property: true
         falcosidekick:
           enabled: false
         resources:
