@@ -6,7 +6,6 @@ metadata:
     policies.kyverno.io/title: Require Resource Limits
     policies.kyverno.io/description: >-
       Requires all containers to have CPU and memory limits defined.
-      Running in Audit mode to observe violations without blocking.
 spec:
   background: true
   rules:
@@ -34,7 +33,7 @@ spec:
       validate:
         failureAction: Audit
         allowExistingViolations: true
-        message: "Container '{{ element.name }}' must have CPU and memory limits defined."
+        message: "All containers must have CPU and memory limits defined."
         foreach:
           - list: "request.object.spec.containers"
             deny:

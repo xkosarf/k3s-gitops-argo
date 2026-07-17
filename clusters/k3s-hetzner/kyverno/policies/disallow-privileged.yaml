@@ -6,7 +6,6 @@ metadata:
     policies.kyverno.io/title: Disallow Privileged Containers
     policies.kyverno.io/description: >-
       Disallows containers running in privileged mode.
-      Running in Audit mode — Falco and some system components need privileges.
 spec:
   background: true
   rules:
@@ -34,7 +33,7 @@ spec:
       validate:
         failureAction: Audit
         allowExistingViolations: true
-        message: "Privileged containers are not allowed. Container '{{ element.name }}' must not run as privileged."
+        message: "Privileged containers are not allowed."
         foreach:
           - list: "request.object.spec.containers"
             deny:

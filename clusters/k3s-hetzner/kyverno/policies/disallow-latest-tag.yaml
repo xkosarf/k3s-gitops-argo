@@ -6,7 +6,6 @@ metadata:
     policies.kyverno.io/title: Disallow Latest Tag
     policies.kyverno.io/description: >-
       Requires container images to have a pinned tag other than 'latest'.
-      Applies to new workloads in non-system namespaces.
 spec:
   background: true
   rules:
@@ -39,10 +38,7 @@ spec:
           - list: "request.object.spec.containers"
             deny:
               conditions:
-                any:
+                all:
                   - key: "{{ element.image }}"
                     operator: Equals
                     value: "*:latest"
-                  - key: "{{ element.image }}"
-                    operator: NotContains
-                    value: ":"
