@@ -1,0 +1,48 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-resource-limits
+  annotations:
+    policies.kyverno.io/title: Require Resource Limits
+    policies.kyverno.io/description: >-
+      Requires all containers to have CPU and memory limits defined.
+      Running in Audit mode to observe violations without blocking.
+spec:
+  background: true
+  rules:
+    - name: require-resource-limits
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - cattle-system
+                - cattle-fleet-system
+                - cattle-fleet-local-system
+                - cattle-provisioning-capi-system
+                - fleet-default
+                - falco
+                - trivy-system
+                - cert-manager
+                - monitoring
+      validate:
+        failureAction: Audit
+        allowExistingViolations: true
+        message: "Container '{{ element.name }}' must have CPU and memory limits defined."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.resources.limits.memory || '' }}"
+                    operator: Equals
+                    value: ""
+                  - key: "{{ element.resources.limits.cpu || '' }}"
+                    operator: Equals
+                    value: ""

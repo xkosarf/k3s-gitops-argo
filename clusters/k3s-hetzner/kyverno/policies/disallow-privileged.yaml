@@ -1,0 +1,45 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/description: >-
+      Disallows containers running in privileged mode.
+      Running in Audit mode — Falco and some system components need privileges.
+spec:
+  background: true
+  rules:
+    - name: disallow-privileged
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - cattle-system
+                - cattle-fleet-system
+                - cattle-fleet-local-system
+                - cattle-provisioning-capi-system
+                - fleet-default
+                - falco
+                - trivy-system
+                - cert-manager
+                - monitoring
+      validate:
+        failureAction: Audit
+        allowExistingViolations: true
+        message: "Privileged containers are not allowed. Container '{{ element.name }}' must not run as privileged."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.securityContext.privileged || false }}"
+                    operator: Equals
+                    value: true

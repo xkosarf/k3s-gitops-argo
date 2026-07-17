@@ -1,0 +1,48 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+  annotations:
+    policies.kyverno.io/title: Disallow Latest Tag
+    policies.kyverno.io/description: >-
+      Requires container images to have a pinned tag other than 'latest'.
+      Applies to new workloads in non-system namespaces.
+spec:
+  background: true
+  rules:
+    - name: disallow-latest-tag
+      match:
+        any:
+          - resources:
+              kinds: [Pod]
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - cattle-system
+                - cattle-fleet-system
+                - cattle-fleet-local-system
+                - cattle-provisioning-capi-system
+                - fleet-default
+                - falco
+                - trivy-system
+                - cert-manager
+                - monitoring
+      validate:
+        failureAction: Enforce
+        allowExistingViolations: true
+        message: "Image tag 'latest' is not allowed. Use a specific version tag."
+        foreach:
+          - list: "request.object.spec.containers"
+            deny:
+              conditions:
+                any:
+                  - key: "{{ element.image }}"
+                    operator: Equals
+                    value: "*:latest"
+                  - key: "{{ element.image }}"
+                    operator: NotContains
+                    value: ":"
