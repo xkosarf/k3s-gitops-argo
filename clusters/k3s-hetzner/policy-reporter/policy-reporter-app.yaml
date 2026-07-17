@@ -1,0 +1,46 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policy-reporter
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "20"
+spec:
+  project: default
+  source:
+    repoURL: https://kyverno.github.io/policy-reporter
+    chart: policy-reporter
+    targetRevision: 2.24.2
+    helm:
+      releaseName: policy-reporter
+      values: |
+        ui:
+          enabled: true
+          ingress:
+            enabled: true
+            className: traefik
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-prod
+            hosts:
+              - host: kyverno.kosar.sk
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: policy-reporter-tls
+                hosts:
+                  - kyverno.kosar.sk
+        kyvernoPlugin:
+          enabled: true
+        monitoring:
+          enabled: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: policy-reporter
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
