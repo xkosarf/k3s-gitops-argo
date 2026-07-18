@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab-website
+  namespace: lab-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lab-website
+  template:
+    metadata:
+      labels:
+        app: lab-website
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 50m
+              memory: 32Mi
+      volumes:
+        - name: html
+          configMap:
+            name: lab-website
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab-website
+  namespace: lab-website
+spec:
+  selector:
+    app: lab-website
+  ports:
+    - port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lab-website
+  namespace: lab-website
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: lab.kosar.sk
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: lab-website
+                port:
+                  number: 80
+  tls:
+    - secretName: lab-website-tls
+      hosts:
+        - lab.kosar.sk

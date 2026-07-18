@@ -1,0 +1,970 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lab-website
+  namespace: lab-website
+data:
+  index.html: |    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>k3s Security Lab · kosar.sk</title>
+    <style>
+      /* ── TOKENS ── */
+      :root {
+        --bg:        #0e1525;
+        --bg-card:   #131f35;
+        --bg-deep:   #0a1020;
+        --bg-inset:  #0e1a2e;
+        --blue-hi:   #2288ff;
+        --blue-mid:  #1a55dd;
+        --blue-lo:   #4499ff;
+        --blue-mute: #335588;
+        --blue-dim:  #1a3060;
+        --text-head: #e8f0ff;
+        --text-body: #7090bb;
+        --text-dim:  #3a5888;
+        --border:    #1e3060;
+        --border-hi: #2244aa;
+        --green:     #22aa44;
+        --grid:      #141e33;
+      }
+    
+      /* ── RESET ── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
+    
+      body {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text-body);
+        line-height: 1.6;
+        min-height: 100vh;
+        /* subtle dot grid */
+        background-image: radial-gradient(circle, var(--grid) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+    
+      /* ── NAVBAR ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #111827;
+        border-bottom: 1px solid var(--border);
+        padding: 0 40px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+      }
+    
+      .nav-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+    
+      .nav-logo-box {
+        width: 26px; height: 26px;
+        background: var(--blue-mid);
+        border-radius: 5px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: monospace;
+        font-size: 13px;
+        color: #fff;
+        /* 3D effect */
+        box-shadow: 2px 2px 0 #0d2a88, inset 0 1px 0 rgba(100,160,255,0.3);
+        position: relative;
+      }
+    
+      .nav-logo-text {
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--blue-lo);
+      }
+    
+      .nav-logo-text span { color: var(--blue-mute); }
+    
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+    
+      nav ul a {
+        color: var(--text-body);
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.2s;
+      }
+    
+      nav ul a:hover { color: var(--blue-lo); }
+    
+      nav ul .nav-active {
+        color: var(--blue-lo);
+        border-bottom: 1.5px solid var(--blue-hi);
+        padding-bottom: 2px;
+      }
+    
+      nav ul .nav-cta {
+        color: var(--blue-lo);
+        border: 1px solid var(--blue-dim);
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        transition: border-color 0.2s, background 0.2s;
+      }
+    
+      nav ul .nav-cta:hover {
+        background: var(--blue-dim);
+        border-color: var(--blue-mid);
+        color: #fff;
+      }
+    
+      /* ── HERO ── */
+      .hero {
+        position: relative;
+        padding: 80px 40px 60px;
+        overflow: hidden;
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 40px;
+        align-items: center;
+        min-height: 280px;
+      }
+    
+      .hero-text h1 {
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 500;
+        color: var(--text-head);
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+      }
+    
+      .hero-text h1 span { color: var(--blue-hi); }
+    
+      .hero-text p {
+        margin-top: 14px;
+        font-size: 14px;
+        color: var(--text-body);
+        font-family: monospace;
+        letter-spacing: 0.3px;
+      }
+    
+      .hero-tags {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+    
+      .tag {
+        font-size: 11px;
+        color: var(--blue-lo);
+        background: var(--bg-inset);
+        border: 1px solid var(--blue-dim);
+        border-radius: 20px;
+        padding: 4px 14px;
+        /* 3D pill */
+        box-shadow: 0 2px 0 #091a40, inset 0 1px 0 rgba(68,136,255,0.15);
+        position: relative;
+        top: 0;
+        transition: top 0.15s, box-shadow 0.15s;
+      }
+    
+      .tag:hover {
+        top: 1px;
+        box-shadow: 0 1px 0 #091a40, inset 0 1px 0 rgba(68,136,255,0.15);
+      }
+    
+      /* Black hole SVG canvas */
+      .hero-bh { width: 100%; max-width: 420px; }
+    
+      /* ── DIVIDER ── */
+      .divider {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+    
+      .divider hr {
+        flex: 1;
+        border: none;
+        border-top: 1px solid var(--border);
+      }
+    
+      .divider-bh {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+    
+      /* ── SECTION ── */
+      section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 40px 0;
+      }
+    
+      .section-label {
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        margin-bottom: 20px;
+        font-family: monospace;
+      }
+    
+      /* ── TOOL CARDS — 3D ── */
+      .cards-primary {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 16px;
+      }
+    
+      .cards-secondary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 40px;
+      }
+    
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-hi);
+        border-radius: 10px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        /* 3D layered shadow */
+        box-shadow:
+          2px 2px 0 var(--bg-deep),
+          4px 4px 0 #090f1e,
+          0 8px 30px rgba(0,0,0,0.4),
+          inset 0 1px 0 rgba(42,68,170,0.3);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+    
+      .card:hover {
+        transform: translate(-1px, -2px);
+        box-shadow:
+          3px 3px 0 var(--bg-deep),
+          5px 5px 0 #090f1e,
+          0 14px 40px rgba(0,0,0,0.5),
+          inset 0 1px 0 rgba(42,68,170,0.3);
+      }
+    
+      /* Low-poly corner accent */
+      .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0;
+        width: 0; height: 0;
+        border-style: solid;
+        border-width: 44px 44px 0 0;
+        border-color: rgba(26,47,255,0.18) transparent transparent transparent;
+      }
+    
+      /* Top-left 3D highlight edge */
+      .card::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(68,136,255,0.4), transparent);
+      }
+    
+      .card-icon {
+        width: 34px; height: 34px;
+        background: var(--bg-inset);
+        border: 1px solid var(--border-hi);
+        border-radius: 8px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 14px;
+        /* 3D icon box */
+        box-shadow: 2px 2px 0 #091830, inset 0 1px 0 rgba(68,136,255,0.2);
+        font-size: 16px;
+        position: relative;
+        z-index: 1;
+      }
+    
+      .card h3 {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--text-head);
+        margin-bottom: 3px;
+      }
+    
+      .card .card-sub {
+        font-size: 11px;
+        color: var(--blue-mute);
+        margin-bottom: 12px;
+        font-family: monospace;
+      }
+    
+      .card hr {
+        border: none;
+        border-top: 1px solid var(--border);
+        margin-bottom: 10px;
+      }
+    
+      .card ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+    
+      .card ul li {
+        font-size: 11px;
+        color: var(--text-dim);
+      }
+    
+      .card ul li::before {
+        content: '✦ ';
+        color: var(--blue-dim);
+      }
+    
+      .card-status {
+        position: absolute;
+        bottom: 16px; right: 16px;
+        width: 8px; height: 8px;
+        background: var(--green);
+        border-radius: 50%;
+        box-shadow: 0 0 6px var(--green);
+      }
+    
+      .card-link {
+        font-size: 10px;
+        color: var(--blue-mute);
+        font-family: monospace;
+        margin-top: 8px;
+        display: block;
+      }
+    
+      /* Small cards */
+      .card-sm {
+        padding: 16px;
+      }
+    
+      .card-sm .card-icon {
+        width: 28px; height: 28px;
+        font-size: 14px;
+        margin-bottom: 10px;
+      }
+    
+      .card-sm h3 { font-size: 13px; margin-bottom: 2px; }
+      .card-sm .card-sub { font-size: 10px; margin-bottom: 8px; }
+      .card-sm ul li { font-size: 10px; }
+    
+      /* ── GITOPS FLOW ── */
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        margin-bottom: 12px;
+        overflow-x: auto;
+      }
+    
+      .flow-step {
+        flex: 1;
+        min-width: 120px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-hi);
+        border-radius: 8px;
+        padding: 14px 16px;
+        text-align: center;
+        /* 3D */
+        box-shadow: 2px 2px 0 var(--bg-deep), 4px 4px 0 #090f1e, inset 0 1px 0 rgba(42,68,170,0.2);
+        position: relative;
+      }
+    
+      .flow-step::after {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, rgba(68,136,255,0.3), transparent);
+      }
+    
+      .flow-num {
+        font-size: 18px;
+        color: var(--blue-hi);
+        font-weight: 300;
+        display: block;
+        margin-bottom: 2px;
+      }
+    
+      .flow-name {
+        font-size: 12px;
+        color: var(--text-head);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 2px;
+      }
+    
+      .flow-desc {
+        font-size: 10px;
+        color: var(--text-dim);
+        font-family: monospace;
+      }
+    
+      .flow-arrow {
+        flex: 0 0 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 0 4px;
+      }
+    
+      .flow-arrow svg { color: var(--blue-dim); }
+    
+      .flow-arrow-label {
+        font-size: 9px;
+        color: var(--text-dim);
+        font-family: monospace;
+        white-space: nowrap;
+      }
+    
+      .flow-wave {
+        font-size: 10px;
+        color: var(--text-dim);
+        font-family: monospace;
+        margin-top: 8px;
+        line-height: 1.8;
+      }
+    
+      /* ── ENDPOINTS ── */
+      .endpoints {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 40px;
+      }
+    
+      .endpoint {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        /* 3D */
+        box-shadow: 2px 2px 0 var(--bg-deep), inset 0 1px 0 rgba(42,68,170,0.15);
+        transition: border-color 0.2s, transform 0.15s;
+        text-decoration: none;
+        color: inherit;
+      }
+    
+      .endpoint:hover {
+        border-color: var(--blue-mid);
+        transform: translateX(2px);
+      }
+    
+      .endpoint-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 6px var(--green);
+        flex-shrink: 0;
+      }
+    
+      .endpoint-dot.soon {
+        background: var(--blue-hi);
+        box-shadow: 0 0 6px var(--blue-hi);
+      }
+    
+      .endpoint-url {
+        font-size: 13px;
+        color: var(--blue-lo);
+        font-family: monospace;
+        min-width: 220px;
+      }
+    
+      .endpoint-desc {
+        font-size: 12px;
+        color: var(--text-body);
+        flex: 1;
+      }
+    
+      .endpoint-arrow {
+        font-size: 11px;
+        color: var(--text-dim);
+        margin-left: auto;
+      }
+    
+      .endpoint-featured {
+        border-color: var(--blue-mid);
+        background: var(--bg-inset);
+        box-shadow: 2px 2px 0 var(--bg-deep), 0 0 20px rgba(34,136,255,0.08), inset 0 1px 0 rgba(68,136,255,0.2);
+      }
+    
+      /* ── FOOTER ── */
+      footer {
+        margin-top: 20px;
+        border-top: 1px solid var(--border);
+        padding: 40px;
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 40px;
+      }
+    
+      .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+    
+      .footer-text h4 {
+        font-size: 14px;
+        color: var(--blue-lo);
+        font-weight: 500;
+      }
+    
+      .footer-text p {
+        font-size: 11px;
+        color: var(--text-dim);
+        font-family: monospace;
+        margin-top: 3px;
+      }
+    
+      .footer-tools {
+        font-size: 10px;
+        color: var(--text-dim);
+        font-family: monospace;
+        text-align: right;
+      }
+    
+      /* ── BLACK HOLE SVG COMPONENTS ── */
+      /* Used inline in hero and footer */
+    
+      /* ── SCROLL REVEAL ── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+    
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    
+      /* Stagger children */
+      .reveal-stagger > * {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+    
+      .reveal-stagger.visible > *:nth-child(1) { opacity: 1; transform: none; transition-delay: 0s; }
+      .reveal-stagger.visible > *:nth-child(2) { opacity: 1; transform: none; transition-delay: 0.08s; }
+      .reveal-stagger.visible > *:nth-child(3) { opacity: 1; transform: none; transition-delay: 0.16s; }
+      .reveal-stagger.visible > *:nth-child(4) { opacity: 1; transform: none; transition-delay: 0.24s; }
+    
+      @media (prefers-reduced-motion: reduce) {
+        .reveal, .reveal-stagger > * { transition: none; opacity: 1; transform: none; }
+        .card { transition: none; }
+      }
+    
+      @media (max-width: 768px) {
+        .hero { grid-template-columns: 1fr; }
+        .hero-bh { display: none; }
+        .cards-primary { grid-template-columns: 1fr; }
+        .cards-secondary { grid-template-columns: repeat(2, 1fr); }
+        .flow { flex-direction: column; }
+        .flow-arrow { transform: rotate(90deg); }
+        nav ul { gap: 16px; }
+        .nav-logo-text span { display: none; }
+        footer { flex-direction: column; align-items: flex-start; }
+        .footer-tools { text-align: left; }
+      }
+    </style>
+    </head>
+    <body>
+    
+    <!-- ── NAVBAR ── -->
+    <nav>
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-box">λ</div>
+        <span class="nav-logo-text">k3s-lab<span>.kosar.sk</span></span>
+      </a>
+      <ul>
+        <li><a href="#stack" class="nav-active">stack</a></li>
+        <li><a href="#gitops">architecture</a></li>
+        <li><a href="#endpoints">endpoints</a></li>
+        <li><a href="https://github.com/xkosarf/k3s-gitops-argo" target="_blank" rel="noopener" class="nav-cta">github ↗</a></li>
+      </ul>
+    </nav>
+    
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Kubernetes<br><span>Security Lab</span></h1>
+        <p>Single-node K3s · Hetzner Cloud · GitOps via ArgoCD</p>
+        <div class="hero-tags">
+          <span class="tag">ArgoCD</span>
+          <span class="tag">Kyverno</span>
+          <span class="tag">Falco</span>
+          <span class="tag">Trivy</span>
+          <span class="tag">Loki</span>
+          <span class="tag">K3s v1.33</span>
+        </div>
+      </div>
+    
+      <!-- Black hole hero illustration -->
+      <svg class="hero-bh" viewBox="0 0 420 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <!-- Outer glow -->
+        <circle cx="210" cy="130" r="115" fill="#111d30" opacity="0.6"/>
+        <circle cx="210" cy="130" r="95" fill="#0d1828" opacity="0.7"/>
+        <!-- Accretion disk rings -->
+        <ellipse cx="210" cy="130" rx="128" ry="26" fill="none" stroke="#0a1a88" stroke-width="3" opacity="0.5"/>
+        <ellipse cx="210" cy="130" rx="112" ry="22" fill="none" stroke="#1133bb" stroke-width="2.5" opacity="0.5"/>
+        <ellipse cx="210" cy="130" rx="96" ry="18" fill="none" stroke="#1a44dd" stroke-width="2" opacity="0.5"/>
+        <ellipse cx="210" cy="130" rx="80" ry="14" fill="none" stroke="#2255ff" stroke-width="1.5" opacity="0.6"/>
+        <ellipse cx="210" cy="130" rx="64" ry="10" fill="none" stroke="#3366ff" stroke-width="1" opacity="0.5"/>
+        <!-- Event horizon layers -->
+        <circle cx="210" cy="130" r="66" fill="#1a2a44"/>
+        <circle cx="210" cy="130" r="52" fill="#111e38"/>
+        <circle cx="210" cy="130" r="38" fill="#0a1228"/>
+        <circle cx="210" cy="130" r="24" fill="#060c1a"/>
+        <circle cx="210" cy="130" r="11" fill="#030608"/>
+        <!-- Relativistic jets -->
+        <line x1="210" y1="64" x2="210" y2="10" stroke="#2255ff" stroke-width="2" opacity="0.5"/>
+        <line x1="206" y1="22" x2="210" y2="10" stroke="#2255ff" stroke-width="1" opacity="0.35"/>
+        <line x1="214" y1="22" x2="210" y2="10" stroke="#2255ff" stroke-width="1" opacity="0.35"/>
+        <line x1="210" y1="196" x2="210" y2="250" stroke="#2255ff" stroke-width="2" opacity="0.5"/>
+        <line x1="206" y1="238" x2="210" y2="250" stroke="#2255ff" stroke-width="1" opacity="0.35"/>
+        <line x1="214" y1="238" x2="210" y2="250" stroke="#2255ff" stroke-width="1" opacity="0.35"/>
+        <!-- 3D lensing highlight -->
+        <ellipse cx="196" cy="116" rx="20" ry="15" fill="#1a2a50" opacity="0.25"/>
+        <!-- Star field -->
+        <circle cx="40" cy="30" r="1.2" fill="#4488ff" opacity="0.6"/>
+        <circle cx="90" cy="18" r="0.8" fill="#66aaff" opacity="0.5"/>
+        <circle cx="330" cy="22" r="1.4" fill="#4488ff" opacity="0.5"/>
+        <circle cx="380" cy="45" r="1" fill="#88bbff" opacity="0.4"/>
+        <circle cx="60" cy="200" r="1" fill="#4488ff" opacity="0.4"/>
+        <circle cx="370" cy="210" r="1.2" fill="#66aaff" opacity="0.5"/>
+        <circle cx="20" cy="130" r="0.8" fill="#4488ff" opacity="0.4"/>
+        <circle cx="400" cy="100" r="1" fill="#88bbff" opacity="0.5"/>
+      </svg>
+    </div>
+    
+    <!-- Section divider with inline black holes -->
+    <div class="divider">
+      <hr>
+      <div class="divider-bh">
+        <svg width="60" height="16" viewBox="0 0 60 16" aria-hidden="true">
+          <circle cx="8" cy="8" r="5" fill="#1a2a55"/>
+          <ellipse cx="8" cy="8" rx="9" ry="3" fill="none" stroke="#1a44ff" stroke-width="0.8" opacity="0.6"/>
+          <circle cx="30" cy="8" r="7" fill="#0f1e44"/>
+          <ellipse cx="30" cy="8" rx="12" ry="3.5" fill="none" stroke="#2255ff" stroke-width="1" opacity="0.7"/>
+          <circle cx="52" cy="8" r="5" fill="#1a2a55"/>
+          <ellipse cx="52" cy="8" rx="9" ry="3" fill="none" stroke="#1a44ff" stroke-width="0.8" opacity="0.6"/>
+        </svg>
+      </div>
+      <hr>
+    </div>
+    
+    <!-- ── STACK SECTION ── -->
+    <section id="stack">
+      <p class="section-label">The Security Stack</p>
+    
+      <div class="cards-primary reveal-stagger">
+        <!-- Kyverno -->
+        <div class="card">
+          <div class="card-icon">🛡️</div>
+          <h3>Kyverno</h3>
+          <p class="card-sub">admission control</p>
+          <hr>
+          <ul>
+            <li>PSS baseline policy (Audit)</li>
+            <li>Disallow :latest image tag (Enforce)</li>
+            <li>Require CPU &amp; memory limits</li>
+            <li>Disallow privileged containers</li>
+          </ul>
+          <div class="card-status"></div>
+        </div>
+    
+        <!-- Falco -->
+        <div class="card">
+          <div class="card-icon">👁️</div>
+          <h3>Falco</h3>
+          <p class="card-sub">runtime detection · eBPF</p>
+          <hr>
+          <ul>
+            <li>modern_ebpf driver (kernel 6.8+)</li>
+            <li>Shell spawn in container detection</li>
+            <li>Unexpected K8s API connections</li>
+            <li>→ Falcosidekick → Loki</li>
+          </ul>
+          <div class="card-status"></div>
+        </div>
+    
+        <!-- Trivy -->
+        <div class="card">
+          <div class="card-icon">🔍</div>
+          <h3>Trivy Operator</h3>
+          <p class="card-sub">vulnerability scanning</p>
+          <hr>
+          <ul>
+            <li>Image CVE scanning (built-in server)</li>
+            <li>Config audit reports (60+ generated)</li>
+            <li>RBAC assessment reports</li>
+            <li>Infra assessment reports</li>
+          </ul>
+          <div class="card-status"></div>
+        </div>
+      </div>
+    
+      <div class="cards-secondary reveal-stagger">
+        <!-- Grafana -->
+        <div class="card card-sm">
+          <div class="card-icon">📊</div>
+          <h3>Grafana</h3>
+          <p class="card-sub">+ Loki stack</p>
+          <hr>
+          <ul>
+            <li>Falco alert dashboards</li>
+            <li>7-day log retention</li>
+          </ul>
+          <a class="card-link" href="https://grafana.kosar.sk" target="_blank">grafana.kosar.sk ↗</a>
+          <div class="card-status"></div>
+        </div>
+    
+        <!-- Policy Reporter -->
+        <div class="card card-sm">
+          <div class="card-icon">📋</div>
+          <h3>Policy Reporter</h3>
+          <p class="card-sub">Kyverno UI</p>
+          <hr>
+          <ul>
+            <li>PolicyReport CRD viewer</li>
+            <li>Pass/fail per policy</li>
+          </ul>
+          <a class="card-link" href="https://kyverno.kosar.sk" target="_blank">kyverno.kosar.sk ↗</a>
+          <div class="card-status"></div>
+        </div>
+    
+        <!-- ArgoCD -->
+        <div class="card card-sm">
+          <div class="card-icon">🔀</div>
+          <h3>ArgoCD</h3>
+          <p class="card-sub">GitOps engine</p>
+          <hr>
+          <ul>
+            <li>App-of-apps pattern</li>
+            <li>Self-managed via Helm</li>
+          </ul>
+          <a class="card-link" href="https://argocd.kosar.sk" target="_blank">argocd.kosar.sk ↗</a>
+          <div class="card-status"></div>
+        </div>
+    
+        <!-- TLS -->
+        <div class="card card-sm">
+          <div class="card-icon">🔒</div>
+          <h3>TLS / Ingress</h3>
+          <p class="card-sub">cert-manager + Traefik</p>
+          <hr>
+          <ul>
+            <li>Let's Encrypt production</li>
+            <li>*.kosar.sk wildcard domains</li>
+          </ul>
+          <span class="card-link">auto-renewed</span>
+          <div class="card-status"></div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Divider -->
+    <div class="divider" style="padding-top:20px">
+      <hr>
+      <svg width="20" height="16" viewBox="0 0 20 16" aria-hidden="true">
+        <circle cx="10" cy="8" r="6" fill="#0f1e44"/>
+        <ellipse cx="10" cy="8" rx="10" ry="3.5" fill="none" stroke="#2255ff" stroke-width="0.8" opacity="0.7"/>
+      </svg>
+      <hr>
+    </div>
+    
+    <!-- ── GITOPS SECTION ── -->
+    <section id="gitops" style="padding-bottom: 40px;">
+      <p class="section-label">GitOps Flow</p>
+    
+      <div class="flow reveal">
+        <div class="flow-step">
+          <span class="flow-num">①</span>
+          <span class="flow-name">GitHub</span>
+          <span class="flow-desc">git push main</span>
+        </div>
+        <div class="flow-arrow">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+            <line x1="0" y1="6" x2="16" y2="6" stroke="#2244aa" stroke-width="1.2"/>
+            <path d="M12 1L18 6L12 11" stroke="#2244aa" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="flow-arrow-label">webhook</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-num">②</span>
+          <span class="flow-name">ArgoCD</span>
+          <span class="flow-desc">detects diff</span>
+        </div>
+        <div class="flow-arrow">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+            <line x1="0" y1="6" x2="16" y2="6" stroke="#2244aa" stroke-width="1.2"/>
+            <path d="M12 1L18 6L12 11" stroke="#2244aa" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="flow-arrow-label">sync</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-num">③</span>
+          <span class="flow-name">Helm</span>
+          <span class="flow-desc">renders charts</span>
+        </div>
+        <div class="flow-arrow">
+          <svg width="20" height="12" viewBox="0 0 20 12" fill="none">
+            <line x1="0" y1="6" x2="16" y2="6" stroke="#2244aa" stroke-width="1.2"/>
+            <path d="M12 1L18 6L12 11" stroke="#2244aa" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="flow-arrow-label">apply</span>
+        </div>
+        <div class="flow-step">
+          <span class="flow-num">④</span>
+          <span class="flow-name">K3s cluster</span>
+          <span class="flow-desc">state updated ✓</span>
+        </div>
+      </div>
+    
+      <p class="flow-wave">
+        sync-wave order: cert-manager (1) → kyverno (5) → kyverno-policies (10) → trivy (15) → falco + loki + policy-reporter (20)
+      </p>
+    </section>
+    
+    <!-- Divider -->
+    <div class="divider">
+      <hr>
+      <svg width="80" height="16" viewBox="0 0 80 16" aria-hidden="true">
+        <circle cx="8" cy="8" r="4" fill="#1a2a55" opacity="0.8"/>
+        <ellipse cx="8" cy="8" rx="7" ry="2.5" fill="none" stroke="#1a44cc" stroke-width="0.7" opacity="0.6"/>
+        <circle cx="28" cy="8" r="6" fill="#0f1e44" opacity="0.9"/>
+        <ellipse cx="28" cy="8" rx="10" ry="3" fill="none" stroke="#2244ff" stroke-width="0.9" opacity="0.7"/>
+        <circle cx="52" cy="8" r="6" fill="#0f1e44" opacity="0.9"/>
+        <ellipse cx="52" cy="8" rx="10" ry="3" fill="none" stroke="#2244ff" stroke-width="0.9" opacity="0.7"/>
+        <circle cx="72" cy="8" r="4" fill="#1a2a55" opacity="0.8"/>
+        <ellipse cx="72" cy="8" rx="7" ry="2.5" fill="none" stroke="#1a44cc" stroke-width="0.7" opacity="0.6"/>
+      </svg>
+      <hr>
+    </div>
+    
+    <!-- ── ENDPOINTS ── -->
+    <section id="endpoints" style="padding-bottom: 60px;">
+      <p class="section-label">Live Endpoints</p>
+    
+      <div class="endpoints reveal">
+        <a class="endpoint" href="https://argocd.kosar.sk" target="_blank" rel="noopener">
+          <div class="endpoint-dot"></div>
+          <span class="endpoint-url">argocd.kosar.sk</span>
+          <span class="endpoint-desc">ArgoCD — GitOps dashboard, sync status, app-of-apps</span>
+          <span class="endpoint-arrow">↗</span>
+        </a>
+        <a class="endpoint" href="https://grafana.kosar.sk" target="_blank" rel="noopener">
+          <div class="endpoint-dot"></div>
+          <span class="endpoint-url">grafana.kosar.sk</span>
+          <span class="endpoint-desc">Grafana — Falco runtime alerts, Loki log explorer</span>
+          <span class="endpoint-arrow">↗</span>
+        </a>
+        <a class="endpoint" href="https://kyverno.kosar.sk" target="_blank" rel="noopener">
+          <div class="endpoint-dot"></div>
+          <span class="endpoint-url">kyverno.kosar.sk</span>
+          <span class="endpoint-desc">Policy Reporter — Kyverno policy violations and compliance</span>
+          <span class="endpoint-arrow">↗</span>
+        </a>
+        <div class="endpoint endpoint-featured">
+          <div class="endpoint-dot soon"></div>
+          <span class="endpoint-url">lab.kosar.sk</span>
+          <span class="endpoint-desc">This site — security lab documentation and architecture overview</span>
+          <span class="endpoint-arrow" style="color: var(--blue-lo)">building ✦</span>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ── FOOTER ── -->
+    <footer>
+      <div class="footer-left">
+        <!-- Small black hole cluster in footer -->
+        <svg width="80" height="60" viewBox="0 0 80 60" aria-hidden="true">
+          <!-- Supernova remnant -->
+          <circle cx="28" cy="30" r="22" fill="none" stroke="#1a2a55" stroke-width="0.8" opacity="0.6"/>
+          <circle cx="28" cy="30" r="14" fill="none" stroke="#2244aa" stroke-width="0.6" opacity="0.5"/>
+          <circle cx="28" cy="30" r="7" fill="#111e38" stroke="#2255ff" stroke-width="0.8"/>
+          <circle cx="26" cy="28" r="3" fill="#1a2a50" opacity="0.4"/>
+          <!-- Jets -->
+          <line x1="28" y1="8" x2="28" y2="2" stroke="#2244ff" stroke-width="0.8" opacity="0.5"/>
+          <line x1="28" y1="52" x2="28" y2="58" stroke="#2244ff" stroke-width="0.8" opacity="0.5"/>
+          <line x1="6" y1="30" x2="0" y2="30" stroke="#2244ff" stroke-width="0.8" opacity="0.5"/>
+          <line x1="50" y1="30" x2="56" y2="30" stroke="#2244ff" stroke-width="0.8" opacity="0.5"/>
+          <!-- Small black hole right -->
+          <circle cx="64" cy="30" r="12" fill="#080e1a"/>
+          <circle cx="64" cy="30" r="7" fill="#05090f"/>
+          <circle cx="64" cy="30" r="3" fill="#030508"/>
+          <ellipse cx="64" cy="30" rx="16" ry="4" fill="none" stroke="#1a33cc" stroke-width="0.8" opacity="0.6"/>
+          <ellipse cx="64" cy="30" rx="12" ry="3" fill="none" stroke="#2244ff" stroke-width="0.6" opacity="0.5"/>
+          <line x1="64" y1="18" x2="64" y2="10" stroke="#1a33ff" stroke-width="0.8" opacity="0.4"/>
+          <line x1="64" y1="42" x2="64" y2="50" stroke="#1a33ff" stroke-width="0.8" opacity="0.4"/>
+        </svg>
+    
+        <div class="footer-text">
+          <h4>Frantisek Kosar</h4>
+          <p>github.com/xkosarf/k3s-gitops-argo</p>
+        </div>
+      </div>
+    
+      <div class="footer-tools">
+        K3s v1.33 · ArgoCD · Falco · Kyverno · Trivy<br>
+        Loki · Grafana · Policy Reporter · Hetzner Cloud
+      </div>
+    </footer>
+    
+    <script>
+      // Scroll reveal
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+    
+      document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+        observer.observe(el);
+      });
+    
+      // Trigger elements already in viewport on load
+      setTimeout(() => {
+        document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+          const rect = el.getBoundingClientRect();
+          if (rect.top < window.innerHeight) {
+            el.classList.add('visible');
+          }
+        });
+      }, 100);
+    </script>
+    </body>
+    </html>
