@@ -33,7 +33,6 @@ spec:
                               fleet-agent, gitjob, helmops)
 
             - rule: Contact K8S API Server From Container
-              desc: Override to whitelist known legitimate processes
               condition: >
                 k8s_api_server and not k8s_api_allowed_processes
               output: >
