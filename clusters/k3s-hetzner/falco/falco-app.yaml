@@ -30,7 +30,7 @@ spec:
                 proc.name in (python, system-upgrade-, fleetcontroller, manager,
                               argocd-server, argocd-applicat, cainjector, webhook,
                               kyverno-plugin, policyreporter, local-path-prov,
-                              fleet-agent, gitjob, helmops)
+                              fleet-agent, gitjob, helmops, cleanup-control)
 
             - rule: Contact K8S API Server From Container
               condition: k8s_api_server and not k8s_api_allowed_processes
