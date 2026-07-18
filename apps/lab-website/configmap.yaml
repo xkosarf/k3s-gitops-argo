@@ -162,11 +162,10 @@ data:
     none; }\n    footer { flex-direction: column; align-items: flex-start; }\n    .footer-tools
     { text-align: left; }\n  }\n</style>\n</head>\n<body>\n\n<!-- ── NAVBAR ── -->\n<nav>\n
     \ <a href=\"#\" class=\"nav-logo\">\n    <div class=\"nav-logo-box\">λ</div>\n
-    \   <span class=\"nav-logo-text\">k3s-lab<span>.kosar.sk</span></span>\n  </a>\n
-    \ <ul>\n    <li><a href=\"#stack\" class=\"nav-active\">stack</a></li>\n    <li><a
-    href=\"#gitops\">architecture</a></li>\n    <li><a href=\"#endpoints\">endpoints</a></li>\n
-    \   <li><a href=\"https://github.com/xkosarf/k3s-gitops-argo\" target=\"_blank\"
-    rel=\"noopener\" class=\"nav-cta\">github ↗</a></li>\n  </ul>\n</nav>\n\n<!--
+    \   <span class=\"nav-logo-text\">lab<span>.kosar.sk</span></span>\n  </a>\n  <ul>\n
+    \   <li><a href=\"#stack\" class=\"nav-active\">stack</a></li>\n    <li><a href=\"#gitops\">architecture</a></li>\n
+    \   <li><a href=\"#endpoints\">endpoints</a></li>\n    <li><a href=\"https://github.com/xkosarf/k3s-gitops-argo\"
+    target=\"_blank\" rel=\"noopener\" class=\"nav-cta\">github ↗</a></li>\n  </ul>\n</nav>\n\n<!--
     ── HERO ── -->\n<div class=\"hero\">\n  <div class=\"hero-text\">\n    <h1>Kubernetes<br><span>Security
     Lab</span></h1>\n    <p>Single-node K3s · Hetzner Cloud · GitOps via ArgoCD</p>\n
     \   <div class=\"hero-tags\">\n      <span class=\"tag\">ArgoCD</span>\n      <span
