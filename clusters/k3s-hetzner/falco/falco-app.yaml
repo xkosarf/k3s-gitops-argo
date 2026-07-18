@@ -33,13 +33,12 @@ spec:
                               fleet-agent, gitjob, helmops)
 
             - rule: Contact K8S API Server From Container
-              condition: >
-                k8s_api_server and not k8s_api_allowed_processes
+              condition: k8s_api_server and not k8s_api_allowed_processes
               output: >
                 Unexpected connection to K8s API Server from container
-                (connection=%fd.name process=%proc.name ns=%k8s.ns.name pod=%k8s.pod.name)
+                (connection=%fd.name process=%proc.name
+                ns=%k8s.ns.name pod=%k8s.pod.name)
               priority: WARNING
-              tags: [k8s, network, mitre_discovery]
               override:
                 condition: replace
                 output: replace
