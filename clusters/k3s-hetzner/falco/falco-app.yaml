@@ -20,6 +20,31 @@ spec:
           json_output: true
           json_include_output_property: true
           json_include_message_property: true
+          http_output:
+            enabled: true
+            url: http://falco-falcosidekick:2801
+        customRules:
+          falco_rules.local.yaml: |-
+            - macro: k8s_api_allowed_processes
+              condition: >
+                proc.name in (python, system-upgrade-, fleetcontroller, manager,
+                              argocd-server, argocd-applicat, cainjector, webhook,
+                              kyverno-plugin, policyreporter, local-path-prov,
+                              fleet-agent, gitjob, helmops)
+
+            - rule: Contact K8S API Server From Container
+              desc: Override to whitelist known legitimate processes
+              condition: >
+                k8s_api_server and not k8s_api_allowed_processes
+              output: >
+                Unexpected connection to K8s API Server from container
+                (connection=%fd.name process=%proc.name ns=%k8s.ns.name pod=%k8s.pod.name)
+              priority: WARNING
+              tags: [k8s, network, mitre_discovery]
+              override:
+                condition: replace
+                output: replace
+                priority: replace
         falcosidekick:
           enabled: true
           config:
